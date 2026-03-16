@@ -19,10 +19,12 @@ public class Agendamento {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    private String servico;
     private String produto;
     private String profissional;
     private LocalDateTime dataHoraAgendamento;
     private String cliente;
+    private String telefoneCliente;
     private LocalDateTime dataInsercao = LocalDateTime.now();
 
 
