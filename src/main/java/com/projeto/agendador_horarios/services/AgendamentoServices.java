@@ -43,7 +43,7 @@ public class AgendamentoServices {
     }
 
   public Agendamento alterarAgendamento(Agendamento agendamento, LocalDateTime dataHoraAgendamento, String cliente) {
-    Agendamento agenda = agendamentoRepository findByByDataHoraAgendamentoAndCliente (dataHoraAgendamento, cliente);
+    Agendamento agenda = agendamentoRepository.findByByDataHoraAgendamentoAndCliente(dataHoraAgendamento, cliente);
   }
 
 }
