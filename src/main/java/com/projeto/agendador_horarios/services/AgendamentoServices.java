@@ -42,8 +42,9 @@ public class AgendamentoServices {
         return agendamentoRepository.findByDataHoraAgendamentoBetween(primeiraHoraDia, horaFinalDia);
     }
 
-  public Agendamento alterarAgendamento(Agendamento agendamento, LocalDateTime dataHoraAgendamento, String cliente) {
-    Agendamento agenda = agendamentoRepository.findByByDataHoraAgendamentoAndCliente(dataHoraAgendamento, cliente);
-  }
+    public Agendamento alterarAgendamento(Agendamento agendamento, String cliente, LocalDateTime dataHoraAgendamento) {
+        Agendamento agenda = agendamentoRepository.findByDataHoraAgendamentoAndCliente(dataHoraAgendamento, cliente);
 
-}
+    }
+
+    }
