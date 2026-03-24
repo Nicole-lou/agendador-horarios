@@ -15,7 +15,7 @@ import java.util.Objects;
 public class AgendamentoServices {
 
     private final AgendamentoRepository agendamentoRepository;
-
+    //create e read
     public Agendamento salvarAgendamento(Agendamento agendamento) {
 
         LocalDateTime horaAgendamento = agendamento.getDataHoraAgendamento();
@@ -29,7 +29,7 @@ public class AgendamentoServices {
      }
      return agendamentoRepository.save(agendamento);
     }
-
+    //delete
     public void deletarAgendamento(LocalDateTime dataHoraAgendamento, String cliente) {
 
     agendamentoRepository.deleteByDataHoraAgendamentoAndCliente(dataHoraAgendamento, cliente);
@@ -41,10 +41,19 @@ public class AgendamentoServices {
 
         return agendamentoRepository.findByDataHoraAgendamentoBetween(primeiraHoraDia, horaFinalDia);
     }
-
+    //update
     public Agendamento alterarAgendamento(Agendamento agendamento, String cliente, LocalDateTime dataHoraAgendamento) {
         Agendamento agenda = agendamentoRepository.findByDataHoraAgendamentoAndCliente(dataHoraAgendamento, cliente);
 
+        if(Objects.isNull(agenda)) {
+            throw new RuntimeException("Horário não está preenchido");
+        }
+
+        agendamento.setId(agenda.getId());
+        return agendamentoRepository.save(agendamento);
+
     }
 
     }
+
+    // Um crud completo, temos uma regra completa para esse sistema de agendamento.
