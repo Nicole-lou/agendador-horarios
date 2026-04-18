@@ -11,7 +11,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@RestController("/agendamentos")
+@RestController()
+@RequestMapping("/agendamentos")
 @RequiredArgsConstructor
 public class AgendamentoController {
     private final AgendamentoServices agendamentoServices;
