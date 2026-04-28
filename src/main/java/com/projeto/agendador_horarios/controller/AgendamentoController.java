@@ -3,9 +3,9 @@ package com.projeto.agendador_horarios.controller;
 import com.projeto.agendador_horarios.dto.AgendamentoRequestDTO;
 import com.projeto.agendador_horarios.dto.AgendamentoResponseDTO;
 import com.projeto.agendador_horarios.services.AgendamentoServices;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -21,7 +21,7 @@ public class AgendamentoController {
 
     @PostMapping
     public ResponseEntity<AgendamentoResponseDTO> salvarAgendamento(
-            @Validated @RequestBody AgendamentoRequestDTO dto) {
+            @Valid @RequestBody AgendamentoRequestDTO dto) {
         return ResponseEntity.status(201).body(agendamentoServices.salvarAgendamento(dto));
     }
 
@@ -41,7 +41,7 @@ public class AgendamentoController {
 
     @PutMapping
     public ResponseEntity<AgendamentoResponseDTO> alterarAgendamento(
-            @Validated @RequestBody AgendamentoRequestDTO dto,
+            @Valid @RequestBody AgendamentoRequestDTO dto,
             @RequestParam String cliente,
             @RequestParam LocalDateTime dataHoraAgendamento) {
         return ResponseEntity.accepted()

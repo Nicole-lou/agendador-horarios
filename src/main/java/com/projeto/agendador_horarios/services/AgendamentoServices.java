@@ -21,7 +21,7 @@ public class AgendamentoServices {
     public AgendamentoResponseDTO salvarAgendamento(AgendamentoRequestDTO dto) {
         LocalDateTime horaFim = dto.getDataHoraAgendamento().plusHours(1);
 
-        // ✅ Lógica corrigida: lança exceção se horário JÁ está ocupado
+        // lança exceção se horário JÁ está ocupado
         agendamentoRepository
                 .findByServicoAndDataHoraAgendamentoBetween(
                         dto.getServico(), dto.getDataHoraAgendamento(), horaFim)
