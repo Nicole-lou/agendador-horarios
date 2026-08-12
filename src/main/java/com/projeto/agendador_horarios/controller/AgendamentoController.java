@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -18,6 +19,12 @@ import java.util.List;
 public class AgendamentoController {
 
     private final AgendamentoServices agendamentoServices;
+
+    @PostMapping
+    public ResponseEntity<AgendamentoResponseDTO> salvarAgendamento(@Valid @RequestBody AgendamentoRequestDTO dto) {
+        String uid = SecurityContextHolder.getContext().getAuthentication().getName();
+        return ResponseEntity.status(201).body(agendamentoServices.salvarAgendamento(dto, uid));
+    }
 
     @PostMapping
     public ResponseEntity<AgendamentoResponseDTO> salvarAgendamento(

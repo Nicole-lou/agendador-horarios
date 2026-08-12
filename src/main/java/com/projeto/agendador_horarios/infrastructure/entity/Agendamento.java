@@ -26,6 +26,7 @@ public class Agendamento {
     private String cliente;
     private String telefoneCliente;
     private LocalDateTime dataInsercao = LocalDateTime.now();
+    private String usuarioUid;
 
 
 }
