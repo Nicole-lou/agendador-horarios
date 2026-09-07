@@ -49,5 +49,11 @@ public class AgendamentoController {
             @RequestParam LocalDateTime dataHoraAgendamento) {
         return ResponseEntity.accepted()
                 .body(agendamentoServices.alterarAgendamento(dto, cliente, dataHoraAgendamento));
+
+        @GetMapping("/cliente/{cliente}")
+        public ResponseEntity<List<AgendamentoResponseDTO>> buscarPorCliente(
+                @PathVariable String cliente) {
+            return ResponseEntity.ok(agendamentoServices.buscarPorCliente(cliente));
+        }
     }
 }

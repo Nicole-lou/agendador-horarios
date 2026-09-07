@@ -5,6 +5,7 @@ import com.projeto.agendador_horarios.dto.AgendamentoResponseDTO;
 import com.projeto.agendador_horarios.infrastructure.entity.Agendamento;
 import com.projeto.agendador_horarios.infrastructure.repository.AgendamentoRepository;
 import lombok.RequiredArgsConstructor;
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -83,10 +84,9 @@ public class AgendamentoServices {
     }
 
     private AgendamentoResponseDTO toDTO(Agendamento a) {
-        return new AgendamentoResponseDTO(
-                a.getId(), a.getServico(), a.getProduto(),
-                a.getProfissional(), a.getDataHoraAgendamento(),
-                a.getCliente(), a.getTelefoneCliente(), a.getDataInsercao()
-        );
+        return null;
+    }
+
+    public @Nullable AgendamentoResponseDTO buscarPorCliente(String cliente) {
     }
 }
