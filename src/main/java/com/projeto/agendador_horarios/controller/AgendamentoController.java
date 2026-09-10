@@ -8,7 +8,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -19,8 +18,6 @@ import java.util.List;
 public class AgendamentoController {
 
     private final AgendamentoServices agendamentoServices;
-
-
 
     @PostMapping
     public ResponseEntity<AgendamentoResponseDTO> salvarAgendamento(
@@ -42,6 +39,12 @@ public class AgendamentoController {
         return ResponseEntity.ok(agendamentoServices.buscarAgendamentosDia(data));
     }
 
+    @GetMapping("/cliente/{cliente}")
+    public ResponseEntity<List<AgendamentoResponseDTO>> buscarPorCliente(
+            @PathVariable String cliente) {
+        return ResponseEntity.ok(agendamentoServices.buscarPorCliente(cliente));
+    }
+
     @PutMapping
     public ResponseEntity<AgendamentoResponseDTO> alterarAgendamento(
             @Valid @RequestBody AgendamentoRequestDTO dto,
@@ -49,11 +52,5 @@ public class AgendamentoController {
             @RequestParam LocalDateTime dataHoraAgendamento) {
         return ResponseEntity.accepted()
                 .body(agendamentoServices.alterarAgendamento(dto, cliente, dataHoraAgendamento));
-
-        @GetMapping("/cliente/{cliente}")
-        public ResponseEntity<List<AgendamentoResponseDTO>> buscarPorCliente(
-                @PathVariable String cliente) {
-            return ResponseEntity.ok(agendamentoServices.buscarPorCliente(cliente));
-        }
     }
 }
