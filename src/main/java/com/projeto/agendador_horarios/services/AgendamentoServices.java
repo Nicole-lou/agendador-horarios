@@ -18,7 +18,7 @@ public class AgendamentoServices {
 
     private final AgendamentoRepository agendamentoRepository;
 
-    public AgendamentoResponseDTO salvarAgendamento(AgendamentoRequestDTO dto) {
+    public AgendamentoResponseDTO salvarAgendamento(AgendamentoRequestDTO dto, String usuarioUid) {
         LocalDateTime horaFim = dto.getDataHoraAgendamento().plusHours(1);
 
         agendamentoRepository
@@ -28,7 +28,7 @@ public class AgendamentoServices {
                     throw new IllegalStateException("Horário já ocupado para este serviço");
                 });
 
-        Agendamento agendamento = toEntity(dto);
+        Agendamento agendamento = toEntity(dto, usuarioUid);
         return toDTO(agendamentoRepository.save(agendamento));
     }
 
@@ -52,9 +52,9 @@ public class AgendamentoServices {
                 .collect(Collectors.toList());
     }
 
-    public List<AgendamentoResponseDTO> buscarPorCliente(String cliente) {
+    public List<AgendamentoResponseDTO> buscarPorUsuario(String usuarioUid) {
         return agendamentoRepository
-                .findByClienteOrderByDataHoraAgendamentoAsc(cliente)
+                .findByUsuarioUidOrderByDataHoraAgendamentoAsc(usuarioUid)
                 .stream()
                 .map(this::toDTO)
                 .collect(Collectors.toList());
@@ -77,7 +77,7 @@ public class AgendamentoServices {
         return toDTO(agendamentoRepository.save(agenda));
     }
 
-    private Agendamento toEntity(AgendamentoRequestDTO dto) {
+    private Agendamento toEntity(AgendamentoRequestDTO dto, String usuarioUid) {
         Agendamento a = new Agendamento();
         a.setServico(dto.getServico());
         a.setProduto(dto.getProduto());
@@ -85,6 +85,7 @@ public class AgendamentoServices {
         a.setDataHoraAgendamento(dto.getDataHoraAgendamento());
         a.setCliente(dto.getCliente());
         a.setTelefoneCliente(dto.getTelefoneCliente());
+        a.setUsuarioUid(usuarioUid);
         return a;
     }
 
@@ -92,7 +93,8 @@ public class AgendamentoServices {
         return new AgendamentoResponseDTO(
                 a.getId(), a.getServico(), a.getProduto(),
                 a.getProfissional(), a.getDataHoraAgendamento(),
-                a.getCliente(), a.getTelefoneCliente(), a.getDataInsercao()
+                a.getCliente(), a.getTelefoneCliente(), a.getUsuarioUid(),
+                a.getDataInsercao()
         );
     }
 }

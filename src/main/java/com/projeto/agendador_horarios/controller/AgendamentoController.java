@@ -6,6 +6,7 @@ import com.projeto.agendador_horarios.services.AgendamentoServices;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -22,7 +23,8 @@ public class AgendamentoController {
     @PostMapping
     public ResponseEntity<AgendamentoResponseDTO> salvarAgendamento(
             @Valid @RequestBody AgendamentoRequestDTO dto) {
-        return ResponseEntity.status(201).body(agendamentoServices.salvarAgendamento(dto));
+        String uid = SecurityContextHolder.getContext().getAuthentication().getName();
+        return ResponseEntity.status(201).body(agendamentoServices.salvarAgendamento(dto, uid));
     }
 
     @DeleteMapping
@@ -39,10 +41,10 @@ public class AgendamentoController {
         return ResponseEntity.ok(agendamentoServices.buscarAgendamentosDia(data));
     }
 
-    @GetMapping("/cliente/{cliente}")
-    public ResponseEntity<List<AgendamentoResponseDTO>> buscarPorCliente(
-            @PathVariable String cliente) {
-        return ResponseEntity.ok(agendamentoServices.buscarPorCliente(cliente));
+    @GetMapping("/meus")
+    public ResponseEntity<List<AgendamentoResponseDTO>> buscarMeusAgendamentos() {
+        String uid = SecurityContextHolder.getContext().getAuthentication().getName();
+        return ResponseEntity.ok(agendamentoServices.buscarPorUsuario(uid));
     }
 
     @PutMapping

@@ -17,4 +17,5 @@ public class AgendamentoResponseDTO {
     private String cliente;
     private String telefoneCliente;
     private LocalDateTime dataInsercao;
+    private String usuarioUid;
 }

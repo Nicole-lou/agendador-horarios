@@ -18,7 +18,7 @@ public interface AgendamentoRepository extends JpaRepository<Agendamento, Long> 
     Optional<Agendamento> findByDataHoraAgendamentoAndCliente(
             LocalDateTime dataHoraAgendamento, String cliente);
 
-    List<Agendamento> findByClienteOrderByDataHoraAgendamentoAsc(String cliente);
+    List<Agendamento> findByUsuarioUidOrderByDataHoraAgendamentoAsc(String usuarioUid);
 
     @Transactional
     void deleteByDataHoraAgendamentoAndCliente(
