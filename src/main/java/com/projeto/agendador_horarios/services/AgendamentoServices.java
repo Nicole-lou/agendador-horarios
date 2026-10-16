@@ -5,7 +5,9 @@ import com.projeto.agendador_horarios.dto.AgendamentoResponseDTO;
 import com.projeto.agendador_horarios.infrastructure.entity.Agendamento;
 import com.projeto.agendador_horarios.infrastructure.repository.AgendamentoRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -19,26 +21,16 @@ public class AgendamentoServices {
     private final AgendamentoRepository agendamentoRepository;
 
     public AgendamentoResponseDTO salvarAgendamento(AgendamentoRequestDTO dto, String usuarioUid) {
-        LocalDateTime horaFim = dto.getDataHoraAgendamento().plusHours(1);
-
-        agendamentoRepository
-                .findByServicoAndDataHoraAgendamentoBetween(
-                        dto.getServico(), dto.getDataHoraAgendamento(), horaFim)
-                .ifPresent(a -> {
-                    throw new IllegalStateException("Horário já ocupado para este serviço");
-                });
+        validarDataFutura(dto.getDataHoraAgendamento());
+        validarHorarioLivre(dto, null);
 
         Agendamento agendamento = toEntity(dto, usuarioUid);
         return toDTO(agendamentoRepository.save(agendamento));
     }
 
-    public void deletarAgendamento(LocalDateTime dataHoraAgendamento, String cliente) {
-        agendamentoRepository
-                .findByDataHoraAgendamentoAndCliente(dataHoraAgendamento, cliente)
-                .orElseThrow(() -> new RuntimeException("Agendamento não encontrado"));
-
-        agendamentoRepository.deleteByDataHoraAgendamentoAndCliente(
-                dataHoraAgendamento, cliente);
+    public void deletarAgendamento(Long id, String usuarioUid) {
+        Agendamento agendamento = buscarDoUsuario(id, usuarioUid);
+        agendamentoRepository.delete(agendamento);
     }
 
     public List<AgendamentoResponseDTO> buscarAgendamentosDia(LocalDate data) {
@@ -61,11 +53,12 @@ public class AgendamentoServices {
     }
 
     public AgendamentoResponseDTO alterarAgendamento(
-            AgendamentoRequestDTO dto, String cliente, LocalDateTime dataHoraAgendamento) {
+            Long id, AgendamentoRequestDTO dto, String usuarioUid) {
 
-        Agendamento agenda = agendamentoRepository
-                .findByDataHoraAgendamentoAndCliente(dataHoraAgendamento, cliente)
-                .orElseThrow(() -> new RuntimeException("Agendamento não encontrado"));
+        Agendamento agenda = buscarDoUsuario(id, usuarioUid);
+
+        validarDataFutura(dto.getDataHoraAgendamento());
+        validarHorarioLivre(dto, id);
 
         agenda.setServico(dto.getServico());
         agenda.setProduto(dto.getProduto());
@@ -75,6 +68,41 @@ public class AgendamentoServices {
         agenda.setTelefoneCliente(dto.getTelefoneCliente());
 
         return toDTO(agendamentoRepository.save(agenda));
+    }
+
+    // Busca pelo id e garante que o agendamento pertence ao usuário logado
+    private Agendamento buscarDoUsuario(Long id, String usuarioUid) {
+        Agendamento agendamento = agendamentoRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Agendamento não encontrado"));
+
+        if (agendamento.getUsuarioUid() == null
+                || !agendamento.getUsuarioUid().equals(usuarioUid)) {
+            throw new ResponseStatusException(
+                    HttpStatus.FORBIDDEN, "Você não tem permissão para acessar este agendamento");
+        }
+        return agendamento;
+    }
+
+    private void validarDataFutura(LocalDateTime dataHora) {
+        if (dataHora.isBefore(LocalDateTime.now())) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, "Não é possível agendar em data/hora que já passou");
+        }
+    }
+
+    // idIgnorado: no PUT, o próprio agendamento não conta como conflito
+    private void validarHorarioLivre(AgendamentoRequestDTO dto, Long idIgnorado) {
+        LocalDateTime horaFim = dto.getDataHoraAgendamento().plusHours(1);
+
+        agendamentoRepository
+                .findByServicoAndDataHoraAgendamentoBetween(
+                        dto.getServico(), dto.getDataHoraAgendamento(), horaFim)
+                .filter(a -> idIgnorado == null || !a.getId().equals(idIgnorado))
+                .ifPresent(a -> {
+                    throw new ResponseStatusException(
+                            HttpStatus.CONFLICT, "Horário já ocupado para este serviço");
+                });
     }
 
     private Agendamento toEntity(AgendamentoRequestDTO dto, String usuarioUid) {

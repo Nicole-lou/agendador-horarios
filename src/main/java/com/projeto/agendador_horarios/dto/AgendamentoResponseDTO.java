@@ -16,6 +16,6 @@ public class AgendamentoResponseDTO {
     private LocalDateTime dataHoraAgendamento;
     private String cliente;
     private String telefoneCliente;
-    private LocalDateTime dataInsercao;
     private String usuarioUid;
+    private LocalDateTime dataInsercao;
 }

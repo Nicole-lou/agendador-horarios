@@ -10,7 +10,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -20,19 +19,15 @@ public class AgendamentoController {
 
     private final AgendamentoServices agendamentoServices;
 
+    private String uidLogado() {
+        return SecurityContextHolder.getContext().getAuthentication().getName();
+    }
+
     @PostMapping
     public ResponseEntity<AgendamentoResponseDTO> salvarAgendamento(
             @Valid @RequestBody AgendamentoRequestDTO dto) {
-        String uid = SecurityContextHolder.getContext().getAuthentication().getName();
-        return ResponseEntity.status(201).body(agendamentoServices.salvarAgendamento(dto, uid));
-    }
-
-    @DeleteMapping
-    public ResponseEntity<Void> deletarAgendamento(
-            @RequestParam String cliente,
-            @RequestParam LocalDateTime dataHoraAgendamento) {
-        agendamentoServices.deletarAgendamento(dataHoraAgendamento, cliente);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.status(201)
+                .body(agendamentoServices.salvarAgendamento(dto, uidLogado()));
     }
 
     @GetMapping
@@ -43,16 +38,19 @@ public class AgendamentoController {
 
     @GetMapping("/meus")
     public ResponseEntity<List<AgendamentoResponseDTO>> buscarMeusAgendamentos() {
-        String uid = SecurityContextHolder.getContext().getAuthentication().getName();
-        return ResponseEntity.ok(agendamentoServices.buscarPorUsuario(uid));
+        return ResponseEntity.ok(agendamentoServices.buscarPorUsuario(uidLogado()));
     }
 
-    @PutMapping
+    @PutMapping("/{id}")
     public ResponseEntity<AgendamentoResponseDTO> alterarAgendamento(
-            @Valid @RequestBody AgendamentoRequestDTO dto,
-            @RequestParam String cliente,
-            @RequestParam LocalDateTime dataHoraAgendamento) {
-        return ResponseEntity.accepted()
-                .body(agendamentoServices.alterarAgendamento(dto, cliente, dataHoraAgendamento));
+            @PathVariable Long id,
+            @Valid @RequestBody AgendamentoRequestDTO dto) {
+        return ResponseEntity.ok(agendamentoServices.alterarAgendamento(id, dto, uidLogado()));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deletarAgendamento(@PathVariable Long id) {
+        agendamentoServices.deletarAgendamento(id, uidLogado());
+        return ResponseEntity.noContent().build();
     }
 }
