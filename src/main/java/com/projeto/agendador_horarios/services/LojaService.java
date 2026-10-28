@@ -20,6 +20,7 @@ public class LojaService {
 
     private final LojaRepository lojaRepository;
     private final MembroRepository membroRepository;
+    private final AcessoLojaService acessoLojaService;
 
     @Transactional
     public LojaResponseDTO criarLoja(LojaRequestDTO dto, String uid) {
@@ -43,12 +44,12 @@ public class LojaService {
     }
 
     public LojaResponseDTO buscarMinhaLoja(String uid) {
-        return toDTO(lojaDoAdmin(uid));
+        return toDTO(acessoLojaService.lojaDoAdmin(uid));
     }
 
     @Transactional
     public LojaResponseDTO atualizarMinhaLoja(LojaRequestDTO dto, String uid) {
-        Loja loja = lojaDoAdmin(uid);
+        Loja loja = acessoLojaService.lojaDoAdmin(uid);
 
         if (!loja.getSlug().equals(dto.getSlug())) {
             validarSlugLivre(dto.getSlug());
@@ -56,14 +57,6 @@ public class LojaService {
 
         preencher(loja, dto);
         return toDTO(salvar(loja));
-    }
-
-    // A loja é sempre descoberta pelo UID do token, nunca por um id vindo do front
-    private Loja lojaDoAdmin(String uid) {
-        return membroRepository.findFirstByUsuarioUidAndPapel(uid, PapelMembro.ADMIN)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "Você ainda não tem uma loja"))
-                .getLoja();
     }
 
     private void validarSlugLivre(String slug) {
